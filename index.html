@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chirag Laheru | Backend Developer</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Bebas+Neue&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#050508;
+  --bg2:#0a0a12;
+  --text:#f0f0f0;
+  --muted:#888;
+  --accent:#7c5cfc;
+  --accent2:#00d4aa;
+  --border:rgba(255,255,255,0.08);
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Space Grotesk',sans-serif;
+  overflow-x:hidden;
+  cursor:none;
+}
+#cursor{
+  width:10px;height:10px;
+  background:white;
+  border-radius:50%;
+  position:fixed;
+  pointer-events:none;
+  z-index:9999;
+  transition:transform 0.15s ease;
+  mix-blend-mode:difference;
+}
+#cursor-ring{
+  width:40px;height:40px;
+  border:1px solid rgba(255,255,255,0.4);
+  border-radius:50%;
+  position:fixed;
+  pointer-events:none;
+  z-index:9998;
+  transition:all 0.12s ease;
+}
+
+/* CANVAS */
+#starfield{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;
+  z-index:100;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:1.5rem 3rem;
+  backdrop-filter:blur(10px);
+  border-bottom:0.5px solid var(--border);
+}
+.nav-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.4rem;
+  letter-spacing:0.1em;
+  color:white;
+}
+.nav-links{display:flex;gap:2rem;list-style:none}
+.nav-links a{
+  color:var(--muted);
+  text-decoration:none;
+  font-size:0.8rem;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  transition:color 0.2s;
+}
+.nav-links a:hover{color:white}
+
+/* SECTIONS */
+section{position:relative;z-index:1}
+
+/* HERO */
+#hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  justify-content:flex-end;
+  padding:0 3rem 4rem;
+  overflow:hidden;
+}
+.hero-eyebrow{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.75rem;
+  color:var(--accent2);
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  margin-bottom:1rem;
+  opacity:0;
+  animation:fadeUp 0.8s 0.3s forwards;
+}
+.hero-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(5rem,12vw,13rem);
+  line-height:0.88;
+  letter-spacing:-0.01em;
+  margin-bottom:1rem;
+}
+.hero-title .solid{
+  color:white;
+  opacity:0;
+  animation:fadeUp 0.8s 0.5s forwards;
+}
+.hero-title .outline{
+  -webkit-text-stroke:1.5px rgba(255,255,255,0.25);
+  color:transparent;
+  opacity:0;
+  animation:fadeUp 0.8s 0.7s forwards;
+}
+.hero-sub{
+  display:flex;gap:3rem;align-items:center;
+  margin-top:2rem;
+  opacity:0;
+  animation:fadeUp 0.8s 0.9s forwards;
+}
+.hero-sub p{
+  font-size:0.85rem;
+  color:var(--muted);
+  max-width:280px;
+  line-height:1.7;
+}
+.hero-scroll{
+  display:flex;align-items:center;gap:0.8rem;
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.7rem;
+  color:var(--muted);
+  letter-spacing:0.1em;
+  margin-left:auto;
+}
+.scroll-line{
+  width:60px;height:1px;
+  background:var(--muted);
+  animation:expandLine 1s 1.2s both;
+}
+@keyframes expandLine{from{width:0}to{width:60px}}
+
+/* FLOATING SHAPES */
+.shape{position:absolute;border-radius:50%;pointer-events:none}
+.shape-1{
+  width:280px;height:280px;
+  top:15%;right:5%;
+  background:radial-gradient(circle at 35% 35%, #c84b9a, #3d1060);
+  border-radius:50% 40% 60% 45%;
+  animation:float1 8s ease-in-out infinite;
+  box-shadow:inset -30px -20px 60px rgba(0,0,0,0.5);
+}
+.shape-2{
+  width:180px;height:180px;
+  top:30%;right:30%;
+  background:radial-gradient(circle at 35% 35%, #5b6ef0, #1a1a6e);
+  border-radius:40% 60% 45% 55%;
+  animation:float2 6s ease-in-out infinite;
+  box-shadow:inset -20px -15px 40px rgba(0,0,0,0.5);
+}
+.shape-3{
+  width:100px;height:100px;
+  top:20%;right:45%;
+  background:radial-gradient(circle at 35% 35%, #e8a340, #7a3d0a);
+  border-radius:40%;
+  animation:float3 7s ease-in-out infinite;
+  box-shadow:inset -15px -10px 30px rgba(0,0,0,0.5);
+}
+.shape-4{
+  width:130px;height:130px;
+  top:55%;right:15%;
+  background:radial-gradient(circle at 35% 35%, #00e8b8, #006b56);
+  border-radius:50%;
+  animation:float1 9s ease-in-out infinite reverse;
+  box-shadow:inset -15px -10px 30px rgba(0,0,0,0.5);
+}
+@keyframes float1{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-30px) rotate(5deg)}}
+@keyframes float2{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(20px) rotate(-8deg)}}
+@keyframes float3{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-15px) rotate(12deg)}}
+
+/* SERVICES */
+#services{padding:8rem 3rem;position:relative}
+.section-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.7rem;
+  color:var(--muted);
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  margin-bottom:0.5rem;
+}
+.section-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(3rem,6vw,6rem);
+  margin-bottom:4rem;
+}
+.section-num{
+  position:absolute;
+  right:3rem;top:8rem;
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.7rem;
+  color:var(--muted);
+  letter-spacing:0.15em;
+}
+.services-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1.5rem;
+}
+.service-card{
+  background:rgba(255,255,255,0.03);
+  border:0.5px solid var(--border);
+  border-radius:16px;
+  padding:2rem;
+  transition:background 0.3s, border-color 0.3s;
+  position:relative;
+  overflow:hidden;
+}
+.service-card::before{
+  content:'';
+  position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 0%, rgba(124,92,252,0.08), transparent 70%);
+  opacity:0;transition:opacity 0.3s;
+}
+.service-card:hover{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.15)}
+.service-card:hover::before{opacity:1}
+.service-icon{
+  width:44px;height:44px;
+  background:rgba(255,255,255,0.06);
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:1.5rem;font-size:18px;
+}
+.service-card h3{font-size:1.15rem;font-weight:600;margin-bottom:0.75rem}
+.service-card p{font-size:0.82rem;color:var(--muted);line-height:1.7}
+
+/* WORKS */
+#works{padding:8rem 3rem;position:relative}
+.works-stats{display:flex;gap:3rem;margin-bottom:3rem}
+.stat{display:flex;flex-direction:column}
+.stat-num{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:3.5rem;line-height:1;color:white;
+}
+.stat-label{font-size:0.7rem;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase}
+.works-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:1.5rem;
+  margin-top:2rem;
+}
+
+/* PROJECT CARD */
+.project-card{
+  background:rgba(255,255,255,0.03);
+  border:0.5px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
+  transition:transform 0.3s, border-color 0.3s;
+  cursor:pointer;
+}
+.project-card:hover{transform:translateY(-6px);border-color:rgba(255,255,255,0.15)}
+
+/* ── PROJECT COVERS ── */
+.project-cover{
+  width:100%;height:220px;
+  position:relative;overflow:hidden;
+  flex-shrink:0;
+}
+
+/* DOODLEX */
+.cover-doodlex{background:#0d0015}
+.ddx-grid{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(140,80,255,0.07) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(140,80,255,0.07) 1px,transparent 1px);
+  background-size:28px 28px;
+}
+.ddx-stroke{position:absolute;border-radius:100px;pointer-events:none}
+.ddx-s1{width:160px;height:6px;background:linear-gradient(90deg,#a855f7,#ec4899);top:60px;left:40px;transform:rotate(-6deg);box-shadow:0 0 18px #a855f780;animation:ddxdraw 2.4s ease-in-out infinite alternate}
+.ddx-s2{width:90px;height:5px;background:linear-gradient(90deg,#22d3ee,#3b82f6);top:100px;left:120px;transform:rotate(10deg);box-shadow:0 0 14px #22d3ee80;animation:ddxdraw 3s 0.4s ease-in-out infinite alternate}
+.ddx-s3{width:120px;height:4px;background:linear-gradient(90deg,#f97316,#fbbf24);top:140px;left:60px;transform:rotate(-3deg);box-shadow:0 0 14px #f9731680;animation:ddxdraw 2.7s 0.8s ease-in-out infinite alternate}
+.ddx-s4{width:70px;height:5px;background:linear-gradient(90deg,#4ade80,#22d3ee);top:80px;left:260px;transform:rotate(14deg);box-shadow:0 0 12px #4ade8080;animation:ddxdraw 3.2s 0.2s ease-in-out infinite alternate}
+.ddx-s5{width:100px;height:4px;background:linear-gradient(90deg,#ec4899,#f97316);top:160px;left:220px;transform:rotate(-8deg);box-shadow:0 0 14px #ec489980;animation:ddxdraw 2.9s 0.6s ease-in-out infinite alternate}
+@keyframes ddxdraw{from{opacity:0.5;transform:scaleX(0.7)}to{opacity:1;transform:scaleX(1)}}
+.ddx-cursor{
+  position:absolute;top:88px;left:190px;
+  width:20px;height:20px;
+  border:2px solid white;border-radius:50% 50% 50% 0;
+  transform:rotate(-45deg);
+  animation:cursorBob 2s ease-in-out infinite;
+}
+@keyframes cursorBob{0%,100%{transform:rotate(-45deg) translate(0,0)}50%{transform:rotate(-45deg) translate(6px,6px)}}
+.ddx-players{position:absolute;bottom:24px;right:32px;display:flex}
+.ddx-avatar{
+  width:28px;height:28px;border-radius:50%;
+  border:2px solid #0d0015;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;color:white;
+  margin-left:-6px;
+}
+.ddx-a1{background:#a855f7}.ddx-a2{background:#22d3ee}.ddx-a3{background:#f97316}.ddx-a4{background:#4ade80}
+.ddx-label{
+  position:absolute;top:24px;left:28px;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:2.8rem;color:white;letter-spacing:0.05em;
+  text-shadow:0 0 40px rgba(168,85,247,0.6);
+}
+.ddx-badge{
+  position:absolute;top:30px;right:28px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.6rem;color:#a855f7;
+  border:1px solid #a855f740;padding:3px 8px;border-radius:100px;letter-spacing:0.1em;
+}
+.ddx-ws{
+  position:absolute;bottom:24px;left:28px;
+  font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:rgba(255,255,255,0.4);
+}
+.ddx-ws span{color:#22d3ee}
+
+/* OSAHAN EAT */
+.cover-osahan{background:#0c0800}
+.osh-map{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(251,146,60,0.06) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(251,146,60,0.06) 1px,transparent 1px);
+  background-size:32px 32px;
+}
+.osh-road{position:absolute;background:rgba(251,146,60,0.12)}
+.osh-r1{width:100%;height:2px;top:50%;left:0}
+.osh-r2{width:2px;height:100%;top:0;left:38%}
+.osh-r3{width:2px;height:100%;top:0;left:68%}
+.osh-r4{width:100%;height:2px;top:35%;left:0}
+.osh-pin{position:absolute;display:flex;flex-direction:column;align-items:center}
+.osh-dot{width:12px;height:12px;border-radius:50%;border:2px solid rgba(255,255,255,0.3)}
+.osh-line{width:2px;height:14px;background:rgba(255,255,255,0.2)}
+.osh-pin1{top:30px;left:30%}.osh-pin1 .osh-dot{background:#f97316;box-shadow:0 0 12px #f9731680}
+.osh-pin2{top:55px;left:60%}.osh-pin2 .osh-dot{background:#ef4444;box-shadow:0 0 12px #ef444480}
+.osh-pin3{top:110px;left:20%}.osh-pin3 .osh-dot{background:#f97316;box-shadow:0 0 10px #f9731660}
+.osh-card{
+  position:absolute;
+  background:rgba(20,12,0,0.85);
+  border:0.5px solid rgba(251,146,60,0.25);
+  border-radius:10px;padding:8px 12px;
+  backdrop-filter:blur(8px);
+}
+.osh-notify p{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:0.6rem;
+  font-family:'JetBrains Mono',monospace;
+}
+
+.wa-label{
+  color:rgba(255,255,255,0.5);
+}
+
+.wa-msg{
+  color:#25d366;
+  font-weight:500;
+}
+.osh-card1{top:22px;right:24px;width:130px}
+.osh-card1 p{font-size:0.6rem;color:rgba(255,255,255,0.4);font-family:'JetBrains Mono',monospace;margin-bottom:3px}
+.osh-card1 h4{font-size:0.75rem;color:white;font-weight:600}
+.osh-card1 .price{font-size:0.65rem;color:#f97316;margin-top:2px}
+.osh-notify{
+  position:absolute;bottom:28px;right:24px;
+  background:rgba(20,12,0,0.9);
+  border:0.5px solid rgba(251,146,60,0.3);
+  border-radius:10px;padding:7px 12px;
+  display:flex;align-items:center;gap:8px;
+}
+.osh-notify-dot{width:8px;height:8px;border-radius:50%;background:#25d366;box-shadow:0 0 8px #25d36680;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.osh-notify p{font-size:0.6rem;color:rgba(255,255,255,0.7);font-family:'JetBrains Mono',monospace}
+.osh-notify span{color:#25d366}
+.osh-label{
+  position:absolute;bottom:28px;left:24px;
+  font-family:'Bebas Neue',sans-serif;font-size:2.8rem;color:white;
+  letter-spacing:0.05em;line-height:0.9;
+  text-shadow:0 0 40px rgba(249,115,22,0.5);
+}
+.osh-sub{
+  position:absolute;top:24px;left:24px;
+  font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:rgba(251,146,60,0.6);
+  letter-spacing:0.15em;text-transform:uppercase;
+}
+
+/* HEALTHHUB */
+.cover-health{background:#00080f}
+.hh-scan{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 50%, rgba(0,210,180,0.04), transparent);
+}
+.hh-circles{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.hh-ring{
+  position:absolute;border-radius:50%;
+  border:1px solid rgba(0,210,180,0.12);
+  animation:ringPulse 3s ease-in-out infinite;
+}
+.hh-tech{
+  font-size:0.6rem;
+  color:#00d4b4;
+  margin:6px 0;
+  line-height:1.4;
+}
+.hh-ring1{width:80px;height:80px;animation-delay:0s}
+.hh-ring2{width:140px;height:140px;animation-delay:0.5s;border-color:rgba(0,210,180,0.08)}
+.hh-ring3{width:200px;height:200px;animation-delay:1s;border-color:rgba(0,210,180,0.05)}
+@keyframes ringPulse{0%,100%{transform:scale(1);opacity:0.8}50%{transform:scale(1.05);opacity:0.4}}
+.hh-center{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:44px;height:44px;
+  background:rgba(0,210,180,0.1);
+  border:1px solid rgba(0,210,180,0.4);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+}
+.hh-cross{font-size:1.2rem}
+.hh-pulse{
+  position:absolute;bottom:0;left:0;right:0;height:70px;overflow:hidden;
+}
+.hh-pulse svg{position:absolute;bottom:0;left:0;width:200%;animation:pulsemove 3s linear infinite}
+@keyframes pulsemove{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.hh-stat{
+  position:absolute;
+  background:rgba(0,8,15,0.8);
+  border:0.5px solid rgba(0,210,180,0.2);
+  border-radius:8px;padding:6px 10px;
+  font-family:'JetBrains Mono',monospace;
+}
+.hh-stat1{top:16px;left:22px}
+.hh-stat1 p{font-size:0.55rem;color:rgba(255,255,255,0.35);margin-bottom:2px}
+.hh-stat1 span{font-size:1rem;font-weight:700;color:#00d4b4}
+.hh-stat2{
+  top:20px;
+  right:20px;
+  max-width:140px; 
+  text-align:right;
+}
+.hh-stat2 p{font-size:0.55rem;color:rgba(255,255,255,0.35);margin-bottom:2px;text-align:right}
+.hh-stat2 span{font-size:1rem;font-weight:700;color:#3b82f6}
+.hh-stat3{
+  bottom:20px;   /* push it to bottom */
+  left:22px;
+}
+.hh-stat{
+  backdrop-filter:blur(6px); /* optional but looks better */
+}
+.hh-stat3 p{font-size:0.55rem;color:rgba(255,255,255,0.35);margin-bottom:2px}
+.hh-stat3 span{font-size:0.75rem;font-weight:600;color:#a78bfa}
+.hh-label{
+  position:absolute;
+  bottom:20px;   /* moved down */
+  right:22px;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:2rem;  /* slightly smaller */
+  color:white;
+}
+.hh-hackathon{
+  position:absolute;top:60px;right:22px;
+  font-family:'JetBrains Mono',monospace;font-size:0.55rem;
+  color:rgba(0,212,180,0.5);letter-spacing:0.1em;text-align:right;
+}
+
+/* PROJECT INFO */
+.project-info{padding:1.5rem}
+.project-meta{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  margin-bottom:0.75rem;
+}
+.project-num{font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--muted)}
+.project-link{
+  width:28px;height:28px;
+  border:0.5px solid var(--border);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--muted);font-size:0.75rem;
+  transition:background 0.2s, color 0.2s;
+}
+.project-link:hover{background:white;color:black}
+.project-card h3{font-size:1rem;font-weight:600;margin-bottom:0.5rem}
+.project-card p{font-size:0.78rem;color:var(--muted);line-height:1.6;margin-bottom:1rem}
+.tags{display:flex;flex-wrap:wrap;gap:0.4rem}
+.tag{
+  font-size:0.68rem;font-family:'JetBrains Mono',monospace;
+  padding:3px 10px;border:0.5px solid var(--border);
+  border-radius:100px;color:var(--muted);
+}
+
+/* TECH */
+#tech{padding:8rem 3rem;position:relative}
+.tech-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(110px,1fr));
+  gap:1rem;margin-top:3rem;
+}
+.tech-item{
+  background:rgba(255,255,255,0.03);
+  border:0.5px solid var(--border);border-radius:12px;
+  padding:1.25rem 1rem;
+  display:flex;flex-direction:column;align-items:center;gap:0.6rem;
+  transition:background 0.25s, border-color 0.25s, transform 0.25s;
+}
+.tech-item:hover{background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.2);transform:translateY(-3px)}
+.tech-icon{font-size:1.6rem;line-height:1}
+.tech-name{font-size:0.7rem;font-family:'JetBrains Mono',monospace;color:var(--muted);text-align:center}
+
+/* MARQUEE */
+.marquee-wrap{
+  overflow:hidden;
+  border-top:0.5px solid var(--border);border-bottom:0.5px solid var(--border);
+  padding:1rem 0;margin:4rem 0;
+}
+.marquee-inner{
+  display:flex;gap:4rem;white-space:nowrap;
+  animation:marquee 18s linear infinite;
+}
+.marquee-item{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.1em;color:var(--muted);flex-shrink:0}
+.marquee-dot{color:var(--accent2)}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* CONTACT */
+#contact{padding:8rem 3rem 6rem;text-align:center}
+.contact-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(4rem,10vw,10rem);line-height:0.9;margin-bottom:2rem;
+}
+.contact-title span{-webkit-text-stroke:1.5px rgba(255,255,255,0.25);color:transparent}
+.contact-links{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin-top:3rem}
+.contact-btn{
+  display:inline-flex;align-items:center;gap:0.6rem;
+  padding:0.8rem 1.8rem;border:0.5px solid var(--border);border-radius:100px;
+  color:var(--muted);text-decoration:none;font-size:0.82rem;
+  font-family:'JetBrains Mono',monospace;letter-spacing:0.05em;transition:all 0.25s;
+}
+.contact-btn:hover{background:white;color:black;border-color:white}
+.contact-btn.primary{background:white;color:black;border-color:white}
+.contact-btn.primary:hover{background:transparent;color:white}
+
+/* FOOTER */
+footer{
+  border-top:0.5px solid var(--border);padding:1.5rem 3rem;
+  display:flex;justify-content:space-between;align-items:center;
+}
+footer p{font-size:0.75rem;color:var(--muted);font-family:'JetBrains Mono',monospace}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity 0.7s ease, transform 0.7s ease}
+.reveal.visible{opacity:1;transform:none}
+
+@media(max-width:768px){
+  nav{padding:1rem 1.5rem}
+  #hero,#services,#works,#tech,#contact{padding-left:1.5rem;padding-right:1.5rem}
+  .hero-title{font-size:4.5rem}
+  .services-grid,.works-grid{grid-template-columns:1fr}
+  .section-num{display:none}
+  .hero-sub{flex-direction:column;gap:1rem}
+  footer{flex-direction:column;gap:0.5rem;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<canvas id="starfield"></canvas>
+
+<nav>
+  <div class="nav-logo">CL</div>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#works">Work</a></li>
+    <li><a href="#tech">Stack</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="shape shape-1"></div>
+  <div class="shape shape-2"></div>
+  <div class="shape shape-3"></div>
+  <div class="shape shape-4"></div>
+
+  <div class="hero-eyebrow">Mumbai, India · Backend Developer · GSoC 2026</div>
+  <div class="hero-title">
+    <div class="solid">BACKEND</div>
+    <div class="outline">SOFTWARE</div>
+    <div class="outline">ENGINEER</div>
+  </div>
+  <div class="hero-sub">
+    <p>Building real-time systems, scalable APIs and full-stack products with Java, Spring Boot & React.</p>
+    <div class="hero-scroll">
+      <div class="scroll-line"></div>
+      SCROLL TO EXPLORE
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-inner">
+    <span class="marquee-item">Java Spring Boot</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Real-time Systems</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">WebSockets</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Laravel</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">React</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">REST APIs</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">GSoC 2026</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">150+ LeetCode</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">CGPA 9.0</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Java Spring Boot</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Real-time Systems</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">WebSockets</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">Laravel</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">React</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">REST APIs</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">GSoC 2026</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">150+ LeetCode</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">CGPA 9.0</span><span class="marquee-dot">·</span>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-label">What I Do</div>
+  <div class="section-title reveal">SERVICES</div>
+  <div class="section-num">01 // MY EXPERTISE</div>
+  <div class="services-grid">
+    <div class="service-card reveal">
+      <div class="service-icon">⚡</div>
+      <h3>Backend Engineering</h3>
+      <p>Building production-grade APIs and real-time systems with Java Spring Boot, WebSockets and event-driven architecture.</p>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-icon">🛠</div>
+      <h3>Full Stack Development</h3>
+      <p>End-to-end web applications with Laravel, Node.js, React and Next.js — from database design to polished UI.</p>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-icon">🔗</div>
+      <h3>API & Integrations</h3>
+      <p>Seamless third-party integrations — Razorpay payments, Twilio WhatsApp API, geolocation services and more.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WORKS -->
+<section id="works">
+  <div class="section-label">Portfolio</div>
+  <div class="section-title reveal">SELECTED WORKS</div>
+  <div class="section-num">02 // PROJECTS</div>
+  <div class="works-stats reveal">
+    <div class="stat"><span class="stat-num">3+</span><span class="stat-label">Projects</span></div>
+    <div class="stat"><span class="stat-num">150+</span><span class="stat-label">LeetCode</span></div>
+    <div class="stat"><span class="stat-num">9.0</span><span class="stat-label">CGPA</span></div>
+  </div>
+  <div class="works-grid">
+
+    <!-- DOODLEX -->
+    <div class="project-card reveal">
+      <div class="project-cover cover-doodlex">
+        <div class="ddx-grid"></div>
+        <div class="ddx-stroke ddx-s1"></div>
+        <div class="ddx-stroke ddx-s2"></div>
+        <div class="ddx-stroke ddx-s3"></div>
+        <div class="ddx-stroke ddx-s4"></div>
+        <div class="ddx-stroke ddx-s5"></div>
+        <div class="ddx-cursor"></div>
+        <div class="ddx-players">
+          <div class="ddx-avatar ddx-a1">A</div>
+          <div class="ddx-avatar ddx-a2">B</div>
+          <div class="ddx-avatar ddx-a3">C</div>
+          <div class="ddx-avatar ddx-a4">+2</div>
+        </div>
+        <div class="ddx-label">DOODLEX</div>
+        <div class="ddx-badge">LIVE · MULTIPLAYER</div>
+        <div class="ddx-ws">ws:// <span>STOMP · WebSocket</span></div>
+      </div>
+      <div class="project-info">
+        <div class="project-meta">
+          <span class="project-num">01</span>
+          <a href="https://doodle-x-7uxz.vercel.app/" target="_blank" class="project-link">↗</a>
+        </div>
+        <h3>DoodleX</h3>
+        <p>Real-time multiplayer drawing game with live canvas sync, turn-based logic and WebSocket-powered instant updates.</p>
+        <div class="tags">
+          <span class="tag">Java</span>
+          <span class="tag">Spring Boot</span>
+          <span class="tag">WebSockets</span>
+          <span class="tag">React</span>
+          <span class="tag">STOMP</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- OSAHAN EAT -->
+    <div class="project-card reveal">
+      <div class="project-cover cover-osahan">
+        <div class="osh-map"></div>
+        <div class="osh-road osh-r1"></div>
+        <div class="osh-road osh-r2"></div>
+        <div class="osh-road osh-r3"></div>
+        <div class="osh-road osh-r4"></div>
+        <div class="osh-pin osh-pin1"><div class="osh-dot"></div><div class="osh-line"></div></div>
+        <div class="osh-pin osh-pin2"><div class="osh-dot"></div><div class="osh-line"></div></div>
+        <div class="osh-pin osh-pin3"><div class="osh-dot"></div><div class="osh-line"></div></div>
+        <div class="osh-sub">Multi-vendor · Food Platform</div>
+        <div class="osh-card osh-card1">
+          <p>ORDER #2847</p>
+          <h4>Butter Chicken x2</h4>
+          <div class="price">₹ 480 · Razorpay ✓</div>
+        </div>
+        <div class="osh-notify">
+  <div class="osh-notify-dot"></div>
+  <div class="osh-notify-text">
+    <span class="wa-label">WhatsApp:</span>
+    <span class="wa-msg">Order confirmed!</span>
+  </div>
+</div>
+        <div class="osh-label">OSAHAN<br>EAT</div>
+      </div>
+      <div class="project-info">
+        <div class="project-meta">
+          <span class="project-num">02</span>
+          <a href="https://osahaneat-1.onrender.com/" target="_blank" class="project-link">↗</a>
+        </div>
+        <h3>Osahan Eat</h3>
+        <p>Multi-vendor food platform with role-based dashboards, Razorpay payments, WhatsApp notifications and geo-search.</p>
+        <div class="tags">
+          <span class="tag">Laravel 11</span>
+          <span class="tag">Razorpay</span>
+          <span class="tag">Twilio</span>
+          <span class="tag">MySQL</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- HEALTHHUB -->
+    <div class="project-card reveal">
+      <div class="project-cover cover-health">
+        <div class="hh-scan"></div>
+        <div class="hh-circles">
+          <div class="hh-ring hh-ring3"></div>
+          <div class="hh-ring hh-ring2"></div>
+          <div class="hh-ring hh-ring1"></div>
+          <div class="hh-center"><div class="hh-cross">✚</div></div>
+        </div>
+        <div class="hh-pulse">
+          <svg viewBox="0 0 800 70" preserveAspectRatio="none" height="70">
+            <polyline points="0,35 80,35 110,10 130,60 150,5 170,55 190,35 300,35 330,35 360,10 380,60 400,5 420,55 440,35 550,35 580,35 610,10 630,60 650,5 670,55 690,35 800,35" fill="none" stroke="rgba(0,212,180,0.5)" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="hh-stat hh-stat1"><p>HEART RATE</p><span>72 BPM</span></div>
+        <div class="hh-stat hh-stat2">
+  <p>API REQUESTS</p>
+  <div class="hh-tech">
+    Next.js · Node.js<br>
+    MongoDB · Tailwind
+  </div>
+  <span>300+/day</span>
+</div>
+        <div class="hh-stat hh-stat3"><p>HACKATHON</p><span>36 HRS · FULL STACK</span></div> 
+        <div class="hh-label">HEALTHHUB</div>
+        <!-- <div class="hh-hackathon">Next.js · Node.js<br>MongoDB · Tailwind</div> -->
+      </div>
+      <div class="project-info">
+        <div class="project-meta">
+          <span class="project-num">03</span>
+          <a href="https://healthcare-frontend-seven.vercel.app/" target="_blank" class="project-link">↗</a>
+        </div>
+        <h3>HealthHub</h3>
+        <p>36-hour hackathon full-stack app — hospital search, appointment booking, 300+ daily API requests, 80% mobile improvement.</p>
+        <div class="tags">
+          <span class="tag">Next.js</span>
+          <span class="tag">Node.js</span>
+          <span class="tag">MongoDB</span>
+          <span class="tag">Tailwind</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- TECH ARSENAL -->
+<section id="tech">
+  <div class="section-label">My Weapons of Choice</div>
+  <div class="section-title reveal">TECH ARSENAL</div>
+  <div class="section-num">03 // CAPABILITIES</div>
+  <div class="tech-grid reveal">
+    <div class="tech-item"><span class="tech-icon">☕</span><span class="tech-name">Java</span></div>
+    <div class="tech-item"><span class="tech-icon">🍃</span><span class="tech-name">Spring Boot</span></div>
+    <div class="tech-item"><span class="tech-icon">⚛️</span><span class="tech-name">React</span></div>
+    <div class="tech-item"><span class="tech-icon">🐘</span><span class="tech-name">Laravel</span></div>
+    <div class="tech-item"><span class="tech-icon">🟢</span><span class="tech-name">Node.js</span></div>
+    <div class="tech-item"><span class="tech-icon">🐳</span><span class="tech-name">Docker</span></div>
+    <div class="tech-item"><span class="tech-icon">🐬</span><span class="tech-name">MySQL</span></div>
+    <div class="tech-item"><span class="tech-icon">🍃</span><span class="tech-name">MongoDB</span></div>
+    <div class="tech-item"><span class="tech-icon">🐍</span><span class="tech-name">Python</span></div>
+    <div class="tech-item"><span class="tech-icon">🟡</span><span class="tech-name">JavaScript</span></div>
+    <div class="tech-item"><span class="tech-icon">🔷</span><span class="tech-name">TypeScript</span></div>
+    <div class="tech-item"><span class="tech-icon">🔧</span><span class="tech-name">Git</span></div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-label">Get In Touch</div>
+  <div class="contact-title reveal">
+    LET'S<br><span>BUILD</span><br>TOGETHER
+  </div>
+  <p style="color:var(--muted);font-size:0.9rem;max-width:400px;margin:0 auto;line-height:1.7" class="reveal">
+    Open to SDE roles at product companies. Currently contributing to GSoC 2026 & open source.
+  </p>
+  <div class="contact-links reveal">
+    <a class="contact-btn primary" href="mailto:chiraglaheru43@gmail.com">chiraglaheru43@gmail.com</a>
+    <a class="contact-btn" href="https://github.com/chiraglaheru" target="_blank">GitHub ↗</a>
+    <a class="contact-btn" href="https://www.linkedin.com/in/chirag-laheru-bb9364319/" target="_blank">LinkedIn ↗</a>
+    <a class="contact-btn" href="tel:+919309591932">+91 9309591932</a>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 Chirag Laheru</p>
+  <p>Mumbai, India · Backend Developer</p>
+</footer>
+
+<script>
+// Custom Cursor
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx - 5 + 'px';
+  cursor.style.top = my - 5 + 'px';
+});
+function animRing() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.left = rx - 20 + 'px';
+  ring.style.top = ry - 20 + 'px';
+  requestAnimationFrame(animRing);
+}
+animRing();
+document.querySelectorAll('a, button, .project-card, .service-card, .tech-item').forEach(el => {
+  el.addEventListener('mouseenter', () => cursor.style.transform = 'scale(3)');
+  el.addEventListener('mouseleave', () => cursor.style.transform = 'scale(1)');
+});
+
+// Starfield
+const canvas = document.getElementById('starfield');
+const ctx = canvas.getContext('2d');
+let stars = [];
+function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+for (let i = 0; i < 180; i++) {
+  stars.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 1.5,
+    a: Math.random(),
+    s: Math.random() * 0.003 + 0.001
+  });
+}
+function drawStars() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  stars.forEach(s => {
+    s.a += s.s;
+    if (s.a > 1 || s.a < 0) s.s *= -1;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,255,255,${s.a * 0.7})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+drawStars();
+
+// Scroll Reveal
+const reveals = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+    }
+  });
+}, { threshold: 0.1 });
+reveals.forEach(r => io.observe(r));
+</script>
+</body>
+</html>
